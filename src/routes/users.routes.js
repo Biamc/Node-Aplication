@@ -10,7 +10,7 @@ const usersController = new UsersController()
 // criar uma instancia de users controlers
 
 usersRoutes.post('/', usersController.create)
-usersRoutes.put('/:id', usersController.edit)
+usersRoutes.put('/:id', usersController.update)
 
 module.exports = usersRoutes
 // exportanto os arquivos do userRoutes

@@ -4,9 +4,7 @@ const AppError = require("../utils/AppError")
 const sqliteConnection = require('../database/sqlite')
 
 class UsersController {
-  // index - GET para listar vários registros.
-  // show - GET paraexebir um registro específico
-  // create -  POST para criar um registro
+  
   async create (request, response) {
     const {users_name, users_email, users_password} = request.body
 
@@ -23,16 +21,10 @@ class UsersController {
 
     return response.status(201).json()
 
-    /*
-      response.json({name, email, password}) //ara devolver uma response pelo formato json, esse é o padrão utilizado
-    */
-    
     
   }
 
-  // update - PUT para atualizar um registro
-
-  async edit(request, response){
+  async update(request, response){
     
    
       const {users_name, users_email, users_password, old_users_password} = request.body
@@ -52,7 +44,7 @@ class UsersController {
       }
   
       user.users_name = users_name ?? user.users_name 
-      // se existir conteúdo dentro de name, este (name) será utilizado, se não houver use o (user.name)
+      
       user.users_email = users_email ?? user.users_email 
 
       if (users_password && !old_users_password){
@@ -62,7 +54,6 @@ class UsersController {
       if(users_password && old_users_password) {
   
         const checkOldPassword = await compare (old_users_password, user.users_password)
-    
           
         if(!checkOldPassword){
             throw new AppError('A senha antiga não confere com a senha informada')
@@ -76,34 +67,15 @@ class UsersController {
       users_name = ?,
       users_email = ?,
       users_password = ?,
-      edited_on = DATETIME('now')
+      updated_at = DATETIME('now')
       WHERE id = ?`,
       [user.users_name, user.users_email, user.users_password, id]
       )
   
       return response.json()
-      
-      
-      
-    
-
-      
-  /*
-      
-  
-       
-  
-       
-  
-      }
-      */
-  
-     
-  
-  
-    
+         
   }
-  // delete - DELETE para remover um registro
+  
 }
 
 

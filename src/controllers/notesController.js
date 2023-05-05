@@ -1,18 +1,17 @@
 const knex = require('../database/knex')
 
-class NotesController {
+class MovieNotesController {
   async create(request, response) {
     const {title, description, rating, tags} = request.body
     const {user_id} = request.params
 
-    const [note_id] = await knex('notes').insert({
+    const [note_id] = await knex('movie_notes').insert({
       title,
       description,
       rating,
       user_id
     })
-    // houve a atulização do knex, dessa forma é necessário envolver o note_id entre {}, pois quando insere a nova movieNotes, ele devolve o note_id dentrode um array na primeira posição
-
+   
     const tagsInsert = tags.map(name => {
       return {
         note_id,
@@ -21,7 +20,7 @@ class NotesController {
       }
     })
 
-    await knex('tags').insert(tagsInsert)
+    await knex('movie_tags').insert(tagsInsert)
     
     response.json()
     
@@ -30,9 +29,9 @@ class NotesController {
   async show(request, response){
     const {id} = request.params
     
-    const note = await knex('notes').where({id}).first()
+    const note = await knex('movie_notes').where({id}).first()
 
-    const tags = await knex('tags').where({note_id:id}).orderBy('name')
+    const tags = await knex('movie_tags').where({note_id:id}).orderBy('name')
 
     return response.json({
       ...note, 
@@ -43,45 +42,43 @@ class NotesController {
   async delete(request, response){
     const {id} = request.params
 
-    await knex('notes').where({id}).delete()
+    await knex('movie_notes').where({id}).delete()
 
     return response.json()
   }
 
-
-  //metodo responsavel por listar as notas
   async index(request, response){
     const {title, user_id, tags} = request.query
 
-    let notes
+    let movieNotes
 
     if(tags) {
       const filterTags = tags.split(',').map(tag => tag.trim())
 
-      notes = await knex('tags')
+      movieNotes = await knex('movie_tags')
       .select([
-        'notes.id',
-        'notes.title',
-        'notes.user_id'
+        'movie_notes.id',
+        'movie_notes.title',
+        'movie_notes.user_id'
       ])
-        .where('notes.user_id', user_id)
-        .whereLike('notes.title', `%${title}%`)
+        .where('movie_notes.user_id', user_id)
+        .whereLike('movie_notes.title', `%${title}%`)
         .whereIn('name', filterTags)
-        .innerJoin('notes', 'notes.id', 'tags.note_id')
+        .innerJoin('movie_notes', 'movie_notes.id', 'movie_tags.note_id')
 
     }else{
       
-      notes = await knex('notes')
+      movieNotes = await knex('movie_notes')
       .where({user_id})
       .whereLike('title', `%${title}%`)
       .orderBy('title')
 
     }
 
-    const userTags = await knex('tags').where({user_id})
+    const userTags = await knex('movie_tags').where({user_id})
 
-    const notesWithTags = notes.map(note => {
-      const noteTags = userTags. filter(tag => tag.note_id == note.id)
+    const movieNotesWithTags = movieNotes.map(note => {
+      const noteTags = userTags. filter(tag => tag.note_id == movieNotes.id)
 
       return {
         ...note,
@@ -89,8 +86,8 @@ class NotesController {
       }
     })
 
-    return response.json(notesWithTags)
+    return response.json(movieNotesWithTags)
   }
 }
 
-module.exports = NotesController
+module.exports = MovieNotesController

@@ -1,5 +1,5 @@
 const path = require('path')
-//importação do path
+
 module.exports = {
 
   development: {
