@@ -3,6 +3,8 @@ const { Router } = require('express');
 
 const UsersController = require('../controllers/usersController.js')
 // criar uma constante para importar o usersControles
+
+const ensureAuthenticated = require('../midlewaeres/ensureAuthenticated')
 const usersRoutes = Router ()
 // cria uma constante para inicializar o Router do express
 
